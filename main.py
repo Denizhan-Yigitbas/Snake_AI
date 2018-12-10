@@ -56,35 +56,40 @@ class Snake(pygame.sprite.Sprite):
     Method the will change the direction of the Snake towards the left
     """
     def moveLeft(self):
-        self.x -= self.width
-        all_sprite_list.add(Snake(WHITE, self.width, self.height, self.x, self.y;))
-        return Snake(WHITE, self.width, self.height, self.x, self.y)
+        #self.x -= self.width
+        #all_sprite_list.add(Snake(WHITE, self.width, self.height, self.x, self.y))
+        #return Snake(WHITE, self.width, self.height, self.x, self.y)
+        return (-10,0)
     
     """
     Method that will change the direction of the Snake toward the right
     """
     def moveRight(self):
-        self.x += self.width
-        all_sprite_list.add(Snake(WHITE, self.width, self.height, self.x, self.y))
-        return Snake(WHITE, self.width, self.height, self.x, self.y)
+        #self.x += self.width
+        #all_sprite_list.add(Snake(WHITE, self.width, self.height, self.x, self.y))
+        return (10,0)
+        #return self.rect.move_ip(30,30)
+        #return Snake(WHITE, self.width, self.height, self.x, self.y)
 
     
     """
     Method that will change the direction of the Snake to go upward
     """
     def moveUp(self):
-        self.y -= self.width
-        all_sprite_list.add(Snake(WHITE, self.width, self.height, self.x, self.y))
-        return Snake(WHITE, self.width, self.height, self.x, self.y)
+        #self.y -= self.width
+        #all_sprite_list.add(Snake(WHITE, self.width, self.height, self.x, self.y))
+        #return Snake(WHITE, self.width, self.height, self.x, self.y)
+        return (0,-10)
     
     
     """
     Method that will change the direction of the Snake to go downward
     """
     def moveDown(self):
-        self.y += self.width
-        all_sprite_list.add(Snake(WHITE, self.width, self.height, self.x, self.y))
-        return Snake(WHITE, self.width, self.height, self.x, self.y)
+        #self.y += self.width
+        #all_sprite_list.add(Snake(WHITE, self.width, self.height, self.x, self.y))
+        #return Snake(WHITE, self.width, self.height, self.x, self.y)
+        return (0,10)
     
     
 class Food(pygame.sprite.Sprite):
@@ -113,13 +118,14 @@ class Food(pygame.sprite.Sprite):
         
 
 class App:
-    
     def __init__(self):
         self._running = True
         self._display_surf = None
         self.size = self.weight, self.height = 400, 400
-        self.snake = Snake(WHITE, 10, 10, 100, 100)
-        all_sprite_list.add(self.snake)
+        self.snake = Snake(WHITE, 10, 10, 20, 20)
+        self.body = []
+        self.body.append(self.snake)
+
         
     
     def on_init(self):
@@ -130,30 +136,60 @@ class App:
         all_sprite_list.add(self.initFood)
         self._running = True
 
+
     """
     Helper Method that will run the events that are clicked on by the user
     """
     def on_event(self):
+        movement = {pygame.K_UP: (0, -1),
+                    pygame.K_DOWN: (0, 1),
+                    pygame.K_LEFT: (-1, 0),
+                    pygame.K_RIGHT: (1, 0)}
+        move = (0,0)
+        
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 self._running = False
             if event.type == pygame.KEYDOWN:
+        #         if event.type == pygame.KEYDOWN:
+        #             move = movement.get(event.key, move)
+        # multipliedMove = map(lambda x: x*10, move)
+        # self.snake.rect.move_ip(tuple(multipliedMove))
+        # self._display_surf.fill(pygame.color.Color('Black'))
+        # pygame.draw.rect(self._display_surf, pygame.color.Color('White'), self.snake.rect)
+        # pygame.display.update()
+        
                 if event.key == pygame.K_LEFT:
                     # TODO: move Snake move to the left
-                    self.snake.moveLeft()
+                    move = self.snake.moveLeft()
+                    # self.body.pop()
+                    # self.body.append(self.snake.moveLeft())
                     print("LEFT")
                 if event.key == pygame.K_RIGHT:
                     # TODO: make Snake move to the right
-                    self.snake.moveRight()
+                    move = self.snake.moveRight()
                     print("RIGHT")
                 if event.key == pygame.K_UP:
                     # TODO: make Snake move up
-                    self.snake.moveUp()
+                    move = self.snake.moveUp()
+                    # self.body.pop()
+                    # self.body.append(self.snake.moveUp())
                     print("UP")
                 if event.key == pygame.K_DOWN:
                     # TODO: make Snake move down
-                    self.snake.moveDown()
+                    move = self.snake.moveDown()
+                    # self.body.pop()
+                    # self.body.append(self.snake.moveDown())
                     print("DOWN")
+        self.snake.rect.move_ip(move)
+        self._display_surf.fill(pygame.color.Color('Black'))
+        pygame.draw.rect(self._display_surf, pygame.color.Color('White'), self.snake.rect)
+        pygame.display.update()
+        pygame.draw.rect(self._display_surf, WHITE, self.snake.rect)
+            # all_sprite_list.empty()
+            # all_sprite_list.add(self.body)
+            # all_sprite_list.draw(self._display_surf)
+        pygame.display.update()
                     
     def on_loop(self):
         pass
@@ -175,8 +211,6 @@ class App:
             self.on_event()
             self.on_loop()
             self.on_render()
-            all_sprite_list.draw(self._display_surf)
-            pygame.display.update()
         self.on_cleanup()
 
 
