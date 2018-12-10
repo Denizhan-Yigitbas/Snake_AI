@@ -18,10 +18,20 @@ class App:
         self._display_surf = pygame.display.set_mode(self.size, pygame.HWSURFACE | pygame.DOUBLEBUF)
         self._running = True
 
-    def on_event(self, event):
-        if event.type == pygame.QUIT:
-            self._running = False
-
+    def on_event(self):
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                self._running = False
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_LEFT:
+                    print("LEFT")
+                if event.key == pygame.K_RIGHT:
+                    print("RIGHT")
+                if event.key == pygame.K_UP:
+                    print("UP")
+                if event.key == pygame.K_DOWN:
+                    print("DOWN")
+                    
     def on_loop(self):
         pass
 
@@ -36,8 +46,7 @@ class App:
             self._running = False
     
         while (self._running):
-            for event in pygame.event.get():
-                self.on_event(event)
+            self.on_event()
             self.on_loop()
             self.on_render()
         self.on_cleanup()
