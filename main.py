@@ -1,6 +1,11 @@
 import pygame
 from pygame.locals import *
 
+class Body:
+    def __init__(self):
+        return 0
+    
+
 
 class App:
     def __init__(self):
