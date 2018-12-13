@@ -1,6 +1,9 @@
 import pygame
 import random
 
+"""
+Class to create a Food at a random coordinate
+"""
 
 class Food(pygame.sprite.Sprite):
     def __init__(self, color, width, height):
@@ -11,13 +14,13 @@ class Food(pygame.sprite.Sprite):
         # This could also be an image loaded from the disk.
         self.image = pygame.Surface([width, height])
         self.image.fill(color)
-        self.rect = pygame.draw.rect(self.image, color, (random.randint(0, 399), random.randint(0, 399), width, height))
         
         # Fetch the rectangle object that has the dimensions of the image
         # Update the position of this object by setting the values of rect.x and rect.y
         self.rect = self.image.get_rect()
         
         # set the position of the Food
+        # TODO: change values in randint to use the input width and height
         randX = random.randint(0,39) * 10
         randY = random.randint(0,39) * 10
         self.rect.x = randX

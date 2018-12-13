@@ -1,6 +1,8 @@
 import pygame
 
-
+"""
+THIS CLASS IS UNNEEDED. KEPT FOR REFERENCE
+"""
 class Block(pygame.sprite.Sprite):
     # Constructor. Pass in the color of the block,
     # and its x and y position
@@ -15,4 +17,4 @@ class Block(pygame.sprite.Sprite):
 
        # Fetch the rectangle object that has the dimensions of the image
        # Update the position of this object by setting the values of rect.x and rect.y
-       self.rect = pygame.draw.rect(self.image, color, width, height)
+       self.rect = self.image.get_rect()

@@ -25,8 +25,6 @@ class Snake(pygame.sprite.Sprite):
         self.width = width
         self.height = height
         
-
-    
     
     """
     Method the will change the direction of the Snake towards the left
