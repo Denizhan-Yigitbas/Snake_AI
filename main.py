@@ -13,8 +13,20 @@ BLACK = (0, 0, 0)
 
 #all_sprite_list = pygame.sprite.Group()
 
+def text_objects(text, font):
+    textSurface = font.render(text, True, BLACK)
+    return textSurface, textSurface.get_rect()
 
+def message_display(display, text, width, height):
+    largeText = pygame.font.Font('freesansbold.ttf',115)
+    TextSurf, TextRect = text_objects(text, largeText)
+    TextRect.center = ((width/2),(height/2))
+    display.blit(TextSurf, TextRect)
+    pygame.display.update()
+
+    
 class App:
+    
     def __init__(self):
         self._running = True
         self._display_surf = None
@@ -46,6 +58,19 @@ class App:
     Helper Method that will run the events that are clicked on by the user
     """
     def on_event(self):
+        
+        # Checks if Snake crashes with itself - LOSE
+        for i in range(1, len(self.snake)):
+            if pygame.sprite.collide_rect(self.snake[0], self.snake[i]):
+                pygame.quit()
+        
+        # Checks if Snake goes off the board
+        if self.snake[0].rect.x == -10 or self.snake[0].rect.x == 400:
+            pygame.quit()
+        if self.snake[0].rect.y == -10 or self.snake[0].rect.y == 400:
+            pygame.quit()
+            
+        # Checks if Snake eats Food - LOSE
         if pygame.sprite.collide_rect(self.snake[0], self.initFood):
             # Erases the current screen
             self._display_surf = pygame.display.set_mode(self.size, pygame.HWSURFACE | pygame.DOUBLEBUF)
@@ -275,6 +300,7 @@ class App:
                     for i in range(len(self.snake)):
                         self._display_surf.blit(self.snake[i].image, self.snake[i].rect)
         pygame.display.update()
+    
                     
     def on_loop(self):
         pass
