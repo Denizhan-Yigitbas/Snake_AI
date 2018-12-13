@@ -23,7 +23,6 @@ def message_display(display, text, width, height):
     TextRect.center = ((width/2),(height/2))
     display.blit(TextSurf, TextRect)
     pygame.display.update()
-
     
 class App:
     
@@ -42,6 +41,10 @@ class App:
         self._display_surf = pygame.display.set_mode(self.size, pygame.HWSURFACE | pygame.DOUBLEBUF)
         self._display_surf.fill(BLACK)
         self._running = True
+        
+        # Create Score Board
+        self.score = 0
+        self.displayScore(self.score, 30)
         
         # Create Initial Food
         self.initFood = Food(RED, 10, 10)
@@ -78,6 +81,10 @@ class App:
             
             # Create a new Food at random location and display it
             self.initFood = Food(RED, 10, 10)
+
+            # Create Score Board
+            self.score += 1
+            self.displayScore(self.score, 30)
             
 
             # Store the last and second to last blocks of the snake
@@ -135,6 +142,9 @@ class App:
                     
                     # add Food
                     self._display_surf.blit(self.initFood.image, self.initFood.rect)
+
+                    # Create Score Board
+                    self.displayScore(self.score, 30)
                     
                     # Store the last and second to last blocks of the snake
                     lastSnakeBlock = self.snake[-1]
@@ -187,6 +197,9 @@ class App:
                     # Add Food
                     self._display_surf.blit(self.initFood.image, self.initFood.rect)
 
+                    # Create Score Board
+                    self.displayScore(self.score, 30)
+
                     # Store the length of the snake
                     currentLength = len(self.snake)
 
@@ -214,6 +227,9 @@ class App:
                     # Erases the current screen
                     self._display_surf = pygame.display.set_mode(self.size, pygame.HWSURFACE | pygame.DOUBLEBUF)
                     self._display_surf.fill(BLACK)
+
+                    # Create Score Board
+                    self.displayScore(self.score, 30)
                     
                     # Add Food
                     self._display_surf.blit(self.initFood.image, self.initFood.rect)
@@ -249,6 +265,9 @@ class App:
                     # Add Food
                     self._display_surf.blit(self.initFood.image, self.initFood.rect)
 
+                    # Create Score Board
+                    self.displayScore(self.score, 30)
+
                     # Store the length of the snake
                     currentLength = len(self.snake)
 
@@ -279,6 +298,9 @@ class App:
                     # Add Food
                     self._display_surf.blit(self.initFood.image, self.initFood.rect)
 
+                    # Create Score Board
+                    self.displayScore(self.score, 30)
+
                     # Store the length of the snake
                     currentLength = len(self.snake)
 
@@ -299,6 +321,12 @@ class App:
                     # displays the shifted snake Blocks
                     for i in range(len(self.snake)):
                         self._display_surf.blit(self.snake[i].image, self.snake[i].rect)
+        pygame.display.update()
+        
+    def displayScore(self, score, size):
+        font = pygame.font.SysFont("Comic Sans MS", size)
+        ScoreBoard = font.render("SCORE: {}".format(score), False, (WHITE))
+        self._display_surf.blit(ScoreBoard, [0, 0])
         pygame.display.update()
     
                     
