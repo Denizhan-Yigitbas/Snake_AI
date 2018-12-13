@@ -11,18 +11,7 @@ WHITE = (255, 255, 255)
 BLACK = (0, 0, 0)
 
 
-#all_sprite_list = pygame.sprite.Group()
 
-def text_objects(text, font):
-    textSurface = font.render(text, True, BLACK)
-    return textSurface, textSurface.get_rect()
-
-def message_display(display, text, width, height):
-    largeText = pygame.font.Font('freesansbold.ttf',115)
-    TextSurf, TextRect = text_objects(text, largeText)
-    TextRect.center = ((width/2),(height/2))
-    display.blit(TextSurf, TextRect)
-    pygame.display.update()
     
 class App:
     
@@ -69,7 +58,8 @@ class App:
         
         # Checks if Snake goes off the board
         if self.snake[0].rect.x == -10 or self.snake[0].rect.x == 400:
-            pygame.quit()
+            self.message_display("LOSE")
+            #pygame.quit()
         if self.snake[0].rect.y == -10 or self.snake[0].rect.y == 400:
             pygame.quit()
             
@@ -125,93 +115,30 @@ class App:
 
             for i in range(len(self.snake)):
                 self._display_surf.blit(self.snake[i].image, self.snake[i].rect)
-        
+                
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 self._running = False
             if event.type == pygame.KEYDOWN:
-                
-                # Adds a block to the end of the snake. This will replace when snake eats a Food
-                # HAS BEEN IMPLEMENTED - FOLLOWING CAN BE REMOVED
-                if event.key == pygame.K_SPACE:
-                    print("SPACE")
-                    
-                    # Erases the current screen
-                    self._display_surf = pygame.display.set_mode(self.size, pygame.HWSURFACE | pygame.DOUBLEBUF)
-                    self._display_surf.fill(BLACK)
-                    
-                    # add Food
-                    self._display_surf.blit(self.initFood.image, self.initFood.rect)
-
-                    # Create Score Board
-                    self.displayScore(self.score, 30)
-                    
-                    # Store the last and second to last blocks of the snake
-                    lastSnakeBlock = self.snake[-1]
-                    secondToLastBlock = self.snake[-2]
-                    
-                    # if the last two blocks are on the same horizontal line and the last block is to the left of the
-                    # second to last block, add a block to the left side of the last block
-                    if lastSnakeBlock.rect.y == secondToLastBlock.rect.y and lastSnakeBlock.rect.x < secondToLastBlock.rect.x:
-                        newX = lastSnakeBlock.rect.x - 10
-                        newSnakeBlock = Snake(lastSnakeBlock.color, lastSnakeBlock.width, lastSnakeBlock.height, newX,
-                                              lastSnakeBlock.rect.y)
-                        self.snake.append(newSnakeBlock)
-
-                    # if the last two blocks are on the same horizontal line and the last block is to the right of the
-                    # second to last block, add a block to the right side of the last block
-                    if lastSnakeBlock.rect.y == secondToLastBlock.rect.y and lastSnakeBlock.rect.x > secondToLastBlock.rect.x:
-                        newX = lastSnakeBlock.rect.x + 10
-                        newSnakeBlock = Snake(lastSnakeBlock.color, lastSnakeBlock.width, lastSnakeBlock.height, newX,
-                                              lastSnakeBlock.rect.y)
-                        self.snake.append(newSnakeBlock)
-                        
-                    # if the last two blocks are on the same vertical line and the last block is above the
-                    # second to last block, add a block above the last block
-                    if lastSnakeBlock.rect.x == secondToLastBlock.rect.x and lastSnakeBlock.rect.y < secondToLastBlock.rect.y:
-                        newY = lastSnakeBlock.rect.y - 10
-                        newSnakeBlock = Snake(lastSnakeBlock.color, lastSnakeBlock.width, lastSnakeBlock.height,
-                                              lastSnakeBlock.rect.x, newY)
-                        self.snake.append(newSnakeBlock)
-
-                    # if the last two blocks are on the same vertical line and the last block is below the
-                    # second to last block, add a block below the last block
-                    if lastSnakeBlock.rect.x == secondToLastBlock.rect.x and lastSnakeBlock.rect.y > secondToLastBlock.rect.y:
-                        newY = lastSnakeBlock.rect.y + 10
-                        newSnakeBlock = Snake(lastSnakeBlock.color, lastSnakeBlock.width, lastSnakeBlock.height,
-                                              lastSnakeBlock.rect.x, newY)
-                        self.snake.append(newSnakeBlock)
-                        
-
-                    # displays all snake Blocks
-                    for i in range(len(self.snake)):
-                        self._display_surf.blit(self.snake[i].image, self.snake[i].rect)
-                    
                 if event.key == pygame.K_LEFT:
                     print("LEFT")
 
-                    # Erases the current screen
-                    self._display_surf = pygame.display.set_mode(self.size, pygame.HWSURFACE | pygame.DOUBLEBUF)
-                    self._display_surf.fill(BLACK)
-                    
-                    # Add Food
-                    self._display_surf.blit(self.initFood.image, self.initFood.rect)
+                    xCoord = self.snake[0].rect.x
+                    yCoord = self.snake[0].rect.y
 
-                    # Create Score Board
-                    self.displayScore(self.score, 30)
+                    # Reset the Board
+                    self.boardReset()
 
                     # Store the length of the snake
                     currentLength = len(self.snake)
 
-                    # Loop that adds the shifted Snake blocks to self.snake array
+                    # Loop to make points follow the head
                     for i in range(len(self.snake)):
-                        player = self.snake[i].image
-    
-                        # Shift the current snake right 10 units
-                        newSnake = self.snake[i].moveLeft()
-    
-                        # append new Snake into list instead of old
-                        self.snake.append(newSnake)
+                        if self.snake[i].rect.x == xCoord and self.snake[i].rect.y == yCoord:
+                            newSnake = self.snake[i].moveLeft()
+        
+                            # append new Snake into list instead of old
+                            self.snake.append(newSnake)
 
                     # removes old snake blocks
                     for i in range(currentLength):
@@ -224,29 +151,25 @@ class App:
                 if event.key == pygame.K_RIGHT:
                     print("RIGHT")
                     
-                    # Erases the current screen
-                    self._display_surf = pygame.display.set_mode(self.size, pygame.HWSURFACE | pygame.DOUBLEBUF)
-                    self._display_surf.fill(BLACK)
-
-                    # Create Score Board
-                    self.displayScore(self.score, 30)
+                    # # get the coordinates of the head of the Snake
+                    xCoord = self.snake[0].rect.x
+                    yCoord = self.snake[0].rect.y
                     
-                    # Add Food
-                    self._display_surf.blit(self.initFood.image, self.initFood.rect)
+                    # Reset the Board
+                    self.boardReset()
                     
                     # Store the length of the snake
                     currentLength = len(self.snake)
-                    
-                    # Loop that adds the shifted Snake blocks to self.snake array
-                    for i in range(len(self.snake)):
-                        player = self.snake[i].image
-
-                        # Shift the current snake right 10 units
-                        newSnake = self.snake[i].moveRight()
+     
                         
-                        # append new Snake into list instead of old
-                        self.snake.append(newSnake)
-                    
+                    # Loop to make points follow the head
+                    for i in range(len(self.snake)):
+                        if self.snake[i].rect.x == xCoord and self.snake[i].rect.y == yCoord:
+                            newSnake = self.snake[i].moveRight()
+
+                            # append new Snake into list instead of old
+                            self.snake.append(newSnake)
+                            
                     # removes old snake blocks
                     for i in range(currentLength):
                         self.snake.pop(0)
@@ -257,29 +180,23 @@ class App:
             
             
                 if event.key == pygame.K_UP:
+                    # # get the coordinates of the head of the Snake
+                    xCoord = self.snake[0].rect.x
+                    yCoord = self.snake[0].rect.y
                     
-                    # Erases the current screen
-                    self._display_surf = pygame.display.set_mode(self.size, pygame.HWSURFACE | pygame.DOUBLEBUF)
-                    self._display_surf.fill(BLACK)
-                    
-                    # Add Food
-                    self._display_surf.blit(self.initFood.image, self.initFood.rect)
-
-                    # Create Score Board
-                    self.displayScore(self.score, 30)
+                    #Reset the board
+                    self.boardReset()
 
                     # Store the length of the snake
                     currentLength = len(self.snake)
 
-                    # Loop that adds the shifted Snake blocks to self.snake array
+                    # Loop to make points follow the head
                     for i in range(len(self.snake)):
-                        player = self.snake[i].image
-    
-                        # Shift the current snake right 10 units
-                        newSnake = self.snake[i].moveUp()
-    
-                        # append new Snake into list instead of old
-                        self.snake.append(newSnake)
+                        if self.snake[i].rect.x == xCoord and self.snake[i].rect.y == yCoord:
+                            newSnake = self.snake[i].moveUp()
+        
+                            # append new Snake into list instead of old
+                            self.snake.append(newSnake)
 
                     # removes old snake blocks
                     for i in range(currentLength):
@@ -290,29 +207,22 @@ class App:
                         self._display_surf.blit(self.snake[i].image, self.snake[i].rect)
                         
                 if event.key == pygame.K_DOWN:
+                    # get the coordinates of the head of the Snake
+                    xCoord = self.snake[0].rect.x
+                    yCoord = self.snake[0].rect.y
                     
-                    # Erases the current screen
-                    self._display_surf = pygame.display.set_mode(self.size, pygame.HWSURFACE | pygame.DOUBLEBUF)
-                    self._display_surf.fill(BLACK)
-                    
-                    # Add Food
-                    self._display_surf.blit(self.initFood.image, self.initFood.rect)
-
-                    # Create Score Board
-                    self.displayScore(self.score, 30)
+                    # Reset the Board
+                    self.boardReset()
 
                     # Store the length of the snake
                     currentLength = len(self.snake)
 
-                    # Loop that adds the shifted Snake blocks to self.snake array
-                    for i in range(currentLength):
-                        player = self.snake[i].image
-    
-                        # Shift the current snake right 10 units
-                        newSnake = self.snake[i].moveDown()
-    
-                        # append new Snake into list instead of old
-                        self.snake.append(newSnake)
+                    for i in range(len(self.snake)):
+                        if self.snake[i].rect.x == xCoord and self.snake[i].rect.y == yCoord:
+                            newSnake = self.snake[i].moveDown()
+
+                            # append new Snake into list instead of old
+                            self.snake.append(newSnake)
 
                     # removes old snake blocks
                     for i in range(currentLength):
@@ -322,13 +232,48 @@ class App:
                     for i in range(len(self.snake)):
                         self._display_surf.blit(self.snake[i].image, self.snake[i].rect)
         pygame.display.update()
-        
+    
+    
+    """
+    Helper method that displays the current score on the screen.
+    """
     def displayScore(self, score, size):
         font = pygame.font.SysFont("Comic Sans MS", size)
         ScoreBoard = font.render("SCORE: {}".format(score), False, (WHITE))
         self._display_surf.blit(ScoreBoard, [0, 0])
         pygame.display.update()
+        
+        
+    """
+    Helper method that will reset the screen:
     
+    Make screen Black
+    Add the current Food block
+    Add the current Score
+    """
+    def boardReset(self):
+        # Erases the current screen
+        self._display_surf = pygame.display.set_mode(self.size, pygame.HWSURFACE | pygame.DOUBLEBUF)
+        self._display_surf.fill(BLACK)
+    
+        # Create Score Board
+        self.displayScore(self.score, 30)
+    
+        # Add Food
+        self._display_surf.blit(self.initFood.image, self.initFood.rect)
+
+    def text_objects(self, text, font):
+        textSurface = font.render(text, True, BLACK)
+        return textSurface, textSurface.get_rect()
+
+    def message_display(self, text):
+        largeText = pygame.font.Font('freesansbold.ttf', 115)
+        TextSurf = largeText.render(text, True, BLACK)
+        TextRect = TextSurf.get_rect()
+        #TextSurf, TextRect = text_objects(text, largeText)
+        TextRect.center = ((self.weight / 2), (self.height / 2))
+        self._display_surf.blit(TextSurf, TextRect)
+        pygame.display.update()
                     
     def on_loop(self):
         pass
