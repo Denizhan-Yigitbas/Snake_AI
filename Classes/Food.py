@@ -21,8 +21,8 @@ class Food(pygame.sprite.Sprite):
         
         # set the position of the Food
         # TODO: change values in randint to use the input width and height
-        randX = random.randint(0,39) * 10
-        randY = random.randint(0,39) * 10
+        randX = random.randint(10,49) * 10
+        randY = random.randint(21,60) * 10
         self.rect.x = randX
         self.rect.y = randY
     
