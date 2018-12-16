@@ -58,6 +58,8 @@ class App:
     def on_event(self):
         # Checks if Snake crashes with itself - LOSE
         for i in range(1, len(self.snake)):
+            print(i)
+            print(len(self.snake))
             if pygame.sprite.collide_rect(self.snake[0], self.snake[1]):
                 self.spaceToRestartText(20)
                 self.gameRestart()
