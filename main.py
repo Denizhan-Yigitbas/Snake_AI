@@ -2,7 +2,6 @@ import pygame
 from pygame.locals import *
 from Classes.Snake import *
 from Classes.Food import *
-from Classes.Block import *
 
 
 # Global Color Variables
