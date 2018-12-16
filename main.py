@@ -26,6 +26,7 @@ class App:
         # Initial Snake array with 3 Snake Blocks starting at (50, 50) and going left
         self.snake = [Snake(WHITE, 10, 10, 150, 260), Snake(WHITE, 10, 10, 140, 260), Snake(WHITE, 10, 10, 130, 260)]
     
+    
     def on_init(self):
         pygame.init()
         self._display_surf = pygame.display.set_mode(self.size, pygame.HWSURFACE | pygame.DOUBLEBUF)
@@ -228,6 +229,7 @@ class App:
         for i in range(len(self.boarder)):
             self._display_surf.blit(self.boarder[i].image, self.boarder[i].rect)
     
+    
     """
     Eating food helper method
     """
@@ -282,6 +284,7 @@ class App:
         for i in range(len(self.snake)):
             self._display_surf.blit(self.snake[i].image, self.snake[i].rect)
 
+
     """
     Takes the player back to initial start state
     """
@@ -313,6 +316,7 @@ class App:
         for i in range(len(self.snake)):
             self._display_surf.blit(self.snake[i].image, self.snake[i].rect)
         pygame.display.update()
+
 
     """
     Creates a List of Blocks that outline the Boarder of the snake game
@@ -357,6 +361,7 @@ class App:
         # return list of blocks
         return allBoarder
 
+
     """
     Allows player to restart a game by pressing space bar - displays losing screen
     """
@@ -364,6 +369,7 @@ class App:
         self._display_surf = pygame.display.set_mode(self.size, pygame.HWSURFACE | pygame.DOUBLEBUF)
         self._display_surf.fill(BLACK)
         self.youLoseText(50)
+        self.yourScoreText(25)
         font = pygame.font.SysFont("Comic Sans MS", size)
         text_surface = font.render("Press space bar to play again", True, WHITE)
         text_rect = text_surface.get_rect(center=(self.weight / 2, self.height / 2))
@@ -379,6 +385,7 @@ class App:
                     if event.key == pygame.K_SPACE:
                         done = True
 
+
     """
     Helper function that prints 'YOU LOSE!'
     """
@@ -389,12 +396,27 @@ class App:
         text_rect = text_surface.get_rect(center=(self.weight / 2, (self.height / 2) - 75))
         self._display_surf.blit(text_surface, text_rect)
         pygame.display.flip()
-                    
+    
+    
+    """
+    Helper function that prints your score at loss
+    """
+    def yourScoreText(self, size):
+        font = pygame.font.SysFont("Comic Sans MS", size)
+        text_surface = font.render("Your Score was: " + str(self.score), True, WHITE)
+        # Shift height up so no collision with space bar text
+        text_rect = text_surface.get_rect(center=(self.weight / 2, (self.height / 2) - 35))
+        self._display_surf.blit(text_surface, text_rect)
+        pygame.display.flip()
+
+        
     def on_loop(self):
         pass
 
+
     def on_render(self):
         pass
+
 
     def on_cleanup(self):
         pygame.quit()
@@ -413,6 +435,7 @@ class App:
             self.on_loop()
             self.on_render()
         self.on_cleanup()
+
 
 if __name__ == "__main__":
     theApp = App()
