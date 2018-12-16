@@ -12,7 +12,7 @@ BLACK = (0, 0, 0)
 CYAN = (0,255, 255)
 
 # Set the speed of the Snake --> lower = faster
-timeDelaySpeed = 1
+timeDelaySpeed = 0
     
 class App:
     def __init__(self):
@@ -57,7 +57,7 @@ class App:
     """
     def on_event(self):
         # Checks if Snake crashes with itself - LOSE
-        for i in range(1, len(self.snake)-1):
+        for i in range(1, len(self.snake)):
             if pygame.sprite.collide_rect(self.snake[0], self.snake[1]):
                 self.spaceToRestartText(20)
                 self.gameRestart()
@@ -81,15 +81,35 @@ class App:
                 self._running = False
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_LEFT:
+                    # check for self collision before eating any food - weird collision method error fix
+                    if self.move == 'right':
+                        self.spaceToRestartText(20)
+                        self.gameRestart()
+                        break
                     self.move = 'left'
                         
                 if event.key == pygame.K_RIGHT:
+                    # check for self collision before eating any food
+                    if self.move == 'left':
+                        self.spaceToRestartText(20)
+                        self.gameRestart()
+                        break
                     self.move = 'right'
             
                 if event.key == pygame.K_UP:
+                    # check for self collision before eating any food
+                    if self.move == 'down':
+                        self.spaceToRestartText(20)
+                        self.gameRestart()
+                        break
                     self.move = 'up'
                         
                 if event.key == pygame.K_DOWN:
+                    # check for self collision before eating any food
+                    if self.move == 'up':
+                        self.spaceToRestartText(20)
+                        self.gameRestart()
+                        break
                     self.move = 'down'
          
         # if stored current direction is right           
