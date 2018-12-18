@@ -10,6 +10,8 @@ WHITE = (255, 255, 255)
 BLACK = (0, 0, 0)
 CYAN = (0,255, 255)
 
+allMoves = ['right', 'left', 'up', 'down']
+
 # Set the speed of the Snake --> lower = faster
 timeDelaySpeed = 0
     
@@ -57,14 +59,10 @@ class App:
     def on_event(self):
         # Checks if Snake crashes with itself - LOSE
         for i in range(1, len(self.snake)):
-            print(i)
-            print(len(self.snake))
-            if pygame.sprite.collide_rect(self.snake[0], self.snake[1]):
-                self.spaceToRestartText(20)
-                self.gameRestart()
             if pygame.sprite.collide_rect(self.snake[0], self.snake[i]):
                 self.spaceToRestartText(20)
                 self.gameRestart()
+                break
     
         # Check if Snake hits the boarder - LOSE
         for i in range(len(self.boarder)):
@@ -75,48 +73,38 @@ class App:
         # Checks if Snake eats Food 
         if pygame.sprite.collide_rect(self.snake[0], self.initFood):
             self.eatFood()
-        
+            
         # set the direction based of key that is pressed
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 self._running = False
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_LEFT:
-                    # check for self collision before eating any food - weird collision method error fix
                     if self.move == 'right':
-                        self.spaceToRestartText(20)
-                        self.gameRestart()
-                        break
-                    self.move = 'left'
+                        self.move = 'right'
+                    else:
+                        self.move = 'left'
                         
                 if event.key == pygame.K_RIGHT:
-                    # check for self collision before eating any food
                     if self.move == 'left':
-                        self.spaceToRestartText(20)
-                        self.gameRestart()
-                        break
-                    self.move = 'right'
+                        self.move == 'left'
+                    else:
+                        self.move = 'right'
             
                 if event.key == pygame.K_UP:
-                    # check for self collision before eating any food
                     if self.move == 'down':
-                        self.spaceToRestartText(20)
-                        self.gameRestart()
-                        break
-                    self.move = 'up'
+                        self.move == 'down'
+                    else:
+                        self.move = 'up'
                         
                 if event.key == pygame.K_DOWN:
-                    # check for self collision before eating any food
                     if self.move == 'up':
-                        self.spaceToRestartText(20)
-                        self.gameRestart()
-                        break
-                    self.move = 'down'
+                        self.move == 'up'
+                    else:
+                        self.move = 'down'
          
         # if stored current direction is right           
         if self.move == 'right':
-            print("RIGHT")
-            
             # Reset the Board
             self.boardReset()
 
@@ -141,8 +129,6 @@ class App:
 
         # if stored current direction is left
         if self.move == 'left':
-            print("LEFT")
-    
             # Reset the Board
             self.boardReset()
     
@@ -167,8 +153,6 @@ class App:
 
         # if stored current direction is up
         if self.move == 'up':
-            print("UP")
-    
             # Reset the Board
             self.boardReset()
     
@@ -193,8 +177,6 @@ class App:
                 
         # if stored current direction is down
         if self.move == 'down':
-            print("DOWN")
-
             # Reset the Board
             self.boardReset()
 
@@ -429,8 +411,8 @@ class App:
         text_rect = text_surface.get_rect(center=(self.weight / 2, (self.height / 2) - 35))
         self._display_surf.blit(text_surface, text_rect)
         pygame.display.flip()
-
         
+
     def on_loop(self):
         pass
 
