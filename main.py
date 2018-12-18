@@ -2,7 +2,7 @@ import pygame
 from pygame.locals import *
 from Classes.Snake import *
 from Classes.Food import *
-
+import random
 
 # Global Color Variables
 RED = (255, 0, 0)
@@ -15,7 +15,14 @@ allMoves = ['right', 'left', 'up', 'down']
 keys = {275: 'right', 274: 'down', 276: 'left', 273: 'up'}
 
 # Set the speed of the Snake --> lower = faster
-timeDelaySpeed = 300
+timeDelaySpeed = 0
+
+
+populationSize = 20
+
+population = []
+
+
     
 class App:
     def __init__(self):
@@ -37,9 +44,16 @@ class App:
         self._display_surf.fill(BLACK)
         self._running = True
         
+        self.child = []
+        
+        self.stepsWithNoChange = 0
+        
         # Create Score Board
         self.score = 0
         self.displayScore(self.score, 45)
+        
+        # Generate Generation Count
+        self.generationCount = 0
         
         # Create Initial Food
         self.initFood = Food(RED, 10, 10)
@@ -60,7 +74,7 @@ class App:
     Helper Method that will run the events that are clicked on by the user
     """
     def on_event(self):
-        print(self.openDirections())
+        # print(self.openDirections())
         # Checks if Snake crashes with itself - LOSE
         for i in range(1, len(self.snake)):
             if pygame.sprite.collide_rect(self.snake[0], self.snake[i]):
@@ -216,6 +230,17 @@ class App:
         pygame.display.update()
         
         
+    def displayGeneration(self, genCount, size):
+        font = pygame.font.SysFont("Comic Sans MS", size)
+        ScoreBoard = font.render("GENERATION: {}".format(genCount), False, (WHITE))
+        self._display_surf.blit(ScoreBoard, [275, 100])
+        pygame.display.update()
+        
+        
+    def displayPopNumber(self):
+        pass
+        
+        
     """
     Helper method that will reset the screen:
     
@@ -230,6 +255,9 @@ class App:
     
         # Create Score Board
         self.displayScore(self.score, 45)
+        
+        # Display generation Number
+        self.displayGeneration(self.generationCount, 45)
     
         # Add Food
         self._display_surf.blit(self.initFood.image, self.initFood.rect)
@@ -250,11 +278,11 @@ class App:
         # Create Score Board
         self.score += 1
         self.displayScore(self.score, 45)
+        
+        # Display generation number
+        self.displayGeneration(self.generationCount, 45)
     
-        # for i in range(len(self.snake)):
-        #     self._display_surf.blit(self.snake[i].image, self.snake[i].rect)
-        #
-        # Store the last and second to last blocks of the snake
+        
         lastSnakeBlock = self.snake[-1]
         secondToLastBlock = self.snake[-2]
     
@@ -303,12 +331,18 @@ class App:
         self._display_surf.fill(BLACK)
         self._running = True
         
+        self.child = []
+        self.stepsWithNoChange = 0
+        
         # Recreate the Snake
         self.snake = [Snake(WHITE, 10, 10, 150, 260), Snake(WHITE, 10, 10, 140, 260), Snake(WHITE, 10, 10, 130, 260)]
     
         # Create Score Board
         self.score = 0
         self.displayScore(self.score, 45)
+        
+        # Display generation number
+        self.displayGeneration(self.generationCount, 45)
     
         # Create Initial Food
         self.initFood = Food(RED, 10, 10)
@@ -438,13 +472,14 @@ class App:
 
             if checkRightCoord == foodCoord:
                 openDirections = ['right']
+                return openDirections
             elif checkUpCoord == foodCoord:
                 openDirections = ['up']
+                return openDirections
             elif checkDownCoord == foodCoord:
                 openDirections = ['down']
+                return openDirections
             
-            
-    
         if self.move == 'left':
             openDirections = ['left', 'up', 'down']
             checkLeft = self.snake[0].moveLeft()
@@ -457,10 +492,13 @@ class App:
             
             if checkLeftCoord == foodCoord:
                 openDirections = ['left']
+                return openDirections
             elif checkUpCoord == foodCoord:
                 openDirections = ['up']
+                return openDirections
             elif checkDownCoord == foodCoord:
                 openDirections = ['down']
+                return openDirections
                 
             for i in range(len(self.boarder)):
                 if pygame.sprite.collide_rect(checkLeft, self.boarder[i]):
@@ -496,10 +534,13 @@ class App:
 
             if checkRightCoord == foodCoord:
                 openDirections = ['right']
+                return openDirections
             elif checkUpCoord == foodCoord:
                 openDirections = ['up']
+                return openDirections
             elif checkDownCoord == foodCoord:
                 openDirections = ['down']
+                return openDirections
             
             for i in range(len(self.boarder)):
                 if pygame.sprite.collide_rect(checkRight, self.boarder[i]):
@@ -535,10 +576,13 @@ class App:
             
             if checkUpCoord == foodCoord:
                 openDirections = ['up']
+                return openDirections
             elif checkLeftCoord == foodCoord:
                 openDirections = ['left']
+                return openDirections
             elif checkRightCoord == foodCoord:
                 openDirections = ['right']
+                return openDirections
                 
                 
             for i in range(len(self.boarder)):
@@ -575,10 +619,13 @@ class App:
 
             if checkDownCoord == foodCoord:
                 openDirections = ['down']
+                return openDirections
             elif checkLeftCoord == foodCoord:
                 openDirections = ['left']
+                return openDirections
             elif checkRightCoord == foodCoord:
                 openDirections = ['right']
+                return openDirections
                 
             for i in range(len(self.boarder)):
                 if pygame.sprite.collide_rect(checkDown, self.boarder[i]):
@@ -593,7 +640,7 @@ class App:
         
             for i in range(1, len(self.snake)):
                 if pygame.sprite.collide_rect(checkDown, self.snake[i]):
-                    index = openDirections.index("up")
+                    index = openDirections.index("down")
                     openDirections.pop(index)
                 if pygame.sprite.collide_rect(checkLeft, self.snake[i]):
                     index = openDirections.index("left")
@@ -605,8 +652,140 @@ class App:
         return openDirections
     
     
-    def on_evnet_AI(self):
-        pass
+    def on_event_AI(self):
+        self.stepsWithNoChange += 1
+        
+        for i in range(1, len(self.snake)):
+            if pygame.sprite.collide_rect(self.snake[0], self.snake[i]):
+                self.spaceToRestartText(20)
+                self.gameRestart()
+                break
+    
+        # Check if Snake hits the boarder - LOSE
+        for i in range(len(self.boarder)):
+            if pygame.sprite.collide_rect(self.snake[0], self.boarder[i]):
+                self.spaceToRestartText(20)
+                self.gameRestart()
+    
+        # Checks if Snake eats Food
+        if pygame.sprite.collide_rect(self.snake[0], self.initFood):
+            self.eatFood()
+            self.stepsWithNoChange = 0
+            
+        possibleDirections = self.openDirections()
+        
+        if self.stepsWithNoChange > 10:
+            possibleDirections = []
+        
+        if possibleDirections == []:
+            print('lost')
+            print('final score: ', self.score)
+            population.append(self.child)
+            print('pop: ', population)
+            print('pop len: ', len(population))
+            self.gameRestart()
+        else:
+            randomMoveIndex = random.randint(0, len(possibleDirections) - 1)
+            self.move = possibleDirections[randomMoveIndex]
+
+        self.child.append(self.move)
+        
+        # if stored current direction is right
+        if self.move == 'right':
+            # Reset the Board
+            self.boardReset()
+
+            # Store the current head of the snake
+            snakeHead = self.snake[0]
+
+            # remove the last block of the snake
+            self.snake.pop()
+
+            # create a new head for the snake that is shifted toward the right
+            newHead = snakeHead.moveRight()
+
+            # add the newly created head to the front of the list - make head
+            self.snake.insert(0, newHead)
+
+            # displays moved snake
+            for i in range(len(self.snake)):
+                self._display_surf.blit(self.snake[i].image, self.snake[i].rect)
+            pygame.display.update()
+
+            pygame.time.delay(timeDelaySpeed)
+
+        # if stored current direction is left
+        if self.move == 'left':
+            # Reset the Board
+            self.boardReset()
+
+            # Store the current head of the snake
+            snakeHead = self.snake[0]
+
+            # remove the last block of the snake
+            self.snake.pop()
+
+            # create a new head for the snake that is shifted toward the right
+            newHead = snakeHead.moveLeft()
+
+            # add the newly created head to the front of the list - make head
+            self.snake.insert(0, newHead)
+
+            # displays moved snake
+            for i in range(len(self.snake)):
+                self._display_surf.blit(self.snake[i].image, self.snake[i].rect)
+            pygame.display.update()
+
+            pygame.time.delay(timeDelaySpeed)
+
+        # if stored current direction is up
+        if self.move == 'up':
+            # Reset the Board
+            self.boardReset()
+
+            # Store the current head of the snake
+            snakeHead = self.snake[0]
+
+            # remove the last block of the snake
+            self.snake.pop()
+
+            # create a new head for the snake that is shifted toward the right
+            newHead = snakeHead.moveUp()
+
+            # add the newly created head to the front of the list - make head
+            self.snake.insert(0, newHead)
+
+            # displays moved snake
+            for i in range(len(self.snake)):
+                self._display_surf.blit(self.snake[i].image, self.snake[i].rect)
+            pygame.display.update()
+
+            pygame.time.delay(timeDelaySpeed)
+
+        # if stored current direction is down
+        if self.move == 'down':
+                # Reset the Board
+                self.boardReset()
+    
+                # Store the current head of the snake
+                snakeHead = self.snake[0]
+    
+                # remove the last block of the snake
+                self.snake.pop()
+    
+                # create a new head for the snake that is shifted toward the right
+                newHead = snakeHead.moveDown()
+    
+                # add the newly created head to the front of the list - make head
+                self.snake.insert(0, newHead)
+    
+                # displays moved snake
+                for i in range(len(self.snake)):
+                    self._display_surf.blit(self.snake[i].image, self.snake[i].rect)
+                pygame.display.update()
+    
+                pygame.time.delay(timeDelaySpeed)
+            
 
 
     def on_loop(self):
@@ -630,7 +809,7 @@ class App:
     
         self.move = ''
         while (self._running):
-            self.on_event()
+            self.on_event_AI()
             self.on_loop()
             self.on_render()
         self.on_cleanup()
