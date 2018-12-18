@@ -15,7 +15,7 @@ allMoves = ['right', 'left', 'up', 'down']
 keys = {275: 'right', 274: 'down', 276: 'left', 273: 'up'}
 
 # Set the speed of the Snake --> lower = faster
-timeDelaySpeed = 0
+timeDelaySpeed = 300
     
 class App:
     def __init__(self):
@@ -420,16 +420,48 @@ class App:
 
 
     def openDirections(self):
+        
+        foodCoord = (self.initFood.rect.x, self.initFood.rect.y)
+        
         openDirections = []
         
         if self.move == '':
             openDirections = ['right', 'up', 'down']
+
+            checkRight = self.snake[0].moveRight()
+            checkUp = self.snake[0].moveUp()
+            checkDown = self.snake[0].moveDown()
+
+            checkRightCoord = (checkRight.rect.x, checkRight.rect.y)
+            checkUpCoord = (checkUp.rect.x, checkUp.rect.y)
+            checkDownCoord = (checkDown.rect.x, checkDown.rect.y)
+
+            if checkRightCoord == foodCoord:
+                openDirections = ['right']
+            elif checkUpCoord == foodCoord:
+                openDirections = ['up']
+            elif checkDownCoord == foodCoord:
+                openDirections = ['down']
+            
+            
     
         if self.move == 'left':
             openDirections = ['left', 'up', 'down']
             checkLeft = self.snake[0].moveLeft()
             checkUp = self.snake[0].moveUp()
             checkDown = self.snake[0].moveDown()
+            
+            checkLeftCoord = (checkLeft.rect.x, checkLeft.rect.y)
+            checkUpCoord = (checkUp.rect.x, checkUp.rect.y)
+            checkDownCoord = (checkDown.rect.x, checkDown.rect.y)
+            
+            if checkLeftCoord == foodCoord:
+                openDirections = ['left']
+            elif checkUpCoord == foodCoord:
+                openDirections = ['up']
+            elif checkDownCoord == foodCoord:
+                openDirections = ['down']
+                
             for i in range(len(self.boarder)):
                 if pygame.sprite.collide_rect(checkLeft, self.boarder[i]):
                     index = openDirections.index("left")
@@ -457,6 +489,18 @@ class App:
             checkRight = self.snake[0].moveRight()
             checkUp = self.snake[0].moveUp()
             checkDown = self.snake[0].moveDown()
+
+            checkRightCoord = (checkRight.rect.x, checkRight.rect.y)
+            checkUpCoord = (checkUp.rect.x, checkUp.rect.y)
+            checkDownCoord = (checkDown.rect.x, checkDown.rect.y)
+
+            if checkRightCoord == foodCoord:
+                openDirections = ['right']
+            elif checkUpCoord == foodCoord:
+                openDirections = ['up']
+            elif checkDownCoord == foodCoord:
+                openDirections = ['down']
+            
             for i in range(len(self.boarder)):
                 if pygame.sprite.collide_rect(checkRight, self.boarder[i]):
                     index = openDirections.index('right')
@@ -484,6 +528,19 @@ class App:
             checkUp = self.snake[0].moveUp()
             checkLeft = self.snake[0].moveLeft()
             checkRight = self.snake[0].moveRight()
+
+            checkUpCoord = (checkUp.rect.x, checkUp.rect.y)
+            checkLeftCoord = (checkLeft.rect.x, checkLeft.rect.y)
+            checkRightCoord = (checkRight.rect.x, checkRight.rect.y)
+            
+            if checkUpCoord == foodCoord:
+                openDirections = ['up']
+            elif checkLeftCoord == foodCoord:
+                openDirections = ['left']
+            elif checkRightCoord == foodCoord:
+                openDirections = ['right']
+                
+                
             for i in range(len(self.boarder)):
                 if pygame.sprite.collide_rect(checkUp, self.boarder[i]):
                     index = openDirections.index("up")
@@ -511,6 +568,18 @@ class App:
             checkDown = self.snake[0].moveDown()
             checkLeft = self.snake[0].moveLeft()
             checkRight = self.snake[0].moveRight()
+
+            checkDownCoord = (checkDown.rect.x, checkDown.rect.y)
+            checkLeftCoord = (checkLeft.rect.x, checkLeft.rect.y)
+            checkRightCoord = (checkRight.rect.x, checkRight.rect.y)
+
+            if checkDownCoord == foodCoord:
+                openDirections = ['down']
+            elif checkLeftCoord == foodCoord:
+                openDirections = ['left']
+            elif checkRightCoord == foodCoord:
+                openDirections = ['right']
+                
             for i in range(len(self.boarder)):
                 if pygame.sprite.collide_rect(checkDown, self.boarder[i]):
                     index = openDirections.index("down")
@@ -535,7 +604,9 @@ class App:
     
         return openDirections
     
+    
     def on_evnet_AI(self):
+        pass
 
 
     def on_loop(self):
