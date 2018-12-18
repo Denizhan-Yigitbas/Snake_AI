@@ -15,7 +15,7 @@ allMoves = ['right', 'left', 'up', 'down']
 keys = {275: 'right', 274: 'down', 276: 'left', 273: 'up'}
 
 # Set the speed of the Snake --> lower = faster
-timeDelaySpeed = 150
+timeDelaySpeed = 0
     
 class App:
     def __init__(self):
@@ -27,7 +27,8 @@ class App:
         self.boarder = self.generateBoard()
         
         # Initial Snake array with 3 Snake Blocks starting at (50, 50) and going left
-        self.snake = [Snake(WHITE, 10, 10, 200, 260), Snake(WHITE, 10, 10, 190, 260), Snake(WHITE, 10, 10, 180, 260), Snake(WHITE, 10, 10, 170, 260), Snake(WHITE, 10, 10, 160, 260), Snake(WHITE, 10, 10, 150, 260), Snake(WHITE, 10, 10, 140, 260), Snake(WHITE, 10, 10, 130, 260)]
+        # self.snake = [Snake(WHITE, 10, 10, 200, 260), Snake(WHITE, 10, 10, 190, 260), Snake(WHITE, 10, 10, 180, 260), Snake(WHITE, 10, 10, 170, 260), Snake(WHITE, 10, 10, 160, 260), Snake(WHITE, 10, 10, 150, 260), Snake(WHITE, 10, 10, 140, 260), Snake(WHITE, 10, 10, 130, 260)]
+        self.snake = [Snake(WHITE, 10, 10, 150, 260), Snake(WHITE, 10, 10, 140, 260), Snake(WHITE, 10, 10, 130, 260)]
     
     
     def on_init(self):
@@ -59,8 +60,7 @@ class App:
     Helper Method that will run the events that are clicked on by the user
     """
     def on_event(self):
-        #print(self.openDirections())
-        print('self.move ',self.move)
+        print(self.openDirections())
         # Checks if Snake crashes with itself - LOSE
         for i in range(1, len(self.snake)):
             if pygame.sprite.collide_rect(self.snake[0], self.snake[i]):
@@ -83,7 +83,6 @@ class App:
             if event.type == pygame.QUIT:
                 self._running = False
             if event.type == pygame.KEYDOWN:
-                print(keys.get(event.key))
                 if event.key == pygame.K_LEFT:
                     if self.move == 'right':
                         self.move = 'right'
@@ -418,6 +417,125 @@ class App:
         text_rect = text_surface.get_rect(center=(self.weight / 2, (self.height / 2) - 35))
         self._display_surf.blit(text_surface, text_rect)
         pygame.display.flip()
+
+
+    def openDirections(self):
+        openDirections = []
+        
+        if self.move == '':
+            openDirections = ['right', 'up', 'down']
+    
+        if self.move == 'left':
+            openDirections = ['left', 'up', 'down']
+            checkLeft = self.snake[0].moveLeft()
+            checkUp = self.snake[0].moveUp()
+            checkDown = self.snake[0].moveDown()
+            for i in range(len(self.boarder)):
+                if pygame.sprite.collide_rect(checkLeft, self.boarder[i]):
+                    index = openDirections.index("left")
+                    openDirections.pop(index)
+                if pygame.sprite.collide_rect(checkUp, self.boarder[i]):
+                    index = openDirections.index("up")
+                    openDirections.pop(index)
+                if pygame.sprite.collide_rect(checkDown, self.boarder[i]):
+                    index = openDirections.index("down")
+                    openDirections.pop(index)
+        
+            for i in range(1, len(self.snake)):
+                if pygame.sprite.collide_rect(checkLeft, self.snake[i]):
+                    index = openDirections.index("left")
+                    openDirections.pop(index)
+                if pygame.sprite.collide_rect(checkUp, self.snake[i]):
+                    index = openDirections.index("up")
+                    openDirections.pop(index)
+                if pygame.sprite.collide_rect(checkDown, self.snake[i]):
+                    index = openDirections.index("down")
+                    openDirections.pop(index)
+    
+        if self.move == 'right':
+            openDirections = ['right', 'up', 'down']
+            checkRight = self.snake[0].moveRight()
+            checkUp = self.snake[0].moveUp()
+            checkDown = self.snake[0].moveDown()
+            for i in range(len(self.boarder)):
+                if pygame.sprite.collide_rect(checkRight, self.boarder[i]):
+                    index = openDirections.index('right')
+                    openDirections.pop(index)
+                if pygame.sprite.collide_rect(checkUp, self.boarder[i]):
+                    index = openDirections.index('up')
+                    openDirections.pop(index)
+                if pygame.sprite.collide_rect(checkDown, self.boarder[i]):
+                    index = openDirections.index('down')
+                    openDirections.pop(index)
+        
+            for i in range(1, len(self.snake)):
+                if pygame.sprite.collide_rect(checkRight, self.snake[i]):
+                    index = openDirections.index("right")
+                    openDirections.pop(index)
+                if pygame.sprite.collide_rect(checkUp, self.snake[i]):
+                    index = openDirections.index("up")
+                    openDirections.pop(index)
+                if pygame.sprite.collide_rect(checkDown, self.snake[i]):
+                    index = openDirections.index("down")
+                    openDirections.pop(index)
+    
+        if self.move == 'up':
+            openDirections = ['up', 'left', 'right']
+            checkUp = self.snake[0].moveUp()
+            checkLeft = self.snake[0].moveLeft()
+            checkRight = self.snake[0].moveRight()
+            for i in range(len(self.boarder)):
+                if pygame.sprite.collide_rect(checkUp, self.boarder[i]):
+                    index = openDirections.index("up")
+                    openDirections.pop(index)
+                if pygame.sprite.collide_rect(checkLeft, self.boarder[i]):
+                    index = openDirections.index("left")
+                    openDirections.pop(index)
+                if pygame.sprite.collide_rect(checkRight, self.boarder[i]):
+                    index = openDirections.index("right")
+                    openDirections.pop(index)
+        
+            for i in range(1, len(self.snake)):
+                if pygame.sprite.collide_rect(checkUp, self.snake[i]):
+                    index = openDirections.index("up")
+                    openDirections.pop(index)
+                if pygame.sprite.collide_rect(checkLeft, self.snake[i]):
+                    index = openDirections.index("left")
+                    openDirections.pop(index)
+                if pygame.sprite.collide_rect(checkRight, self.snake[i]):
+                    index = openDirections.index("right")
+                    openDirections.pop(index)
+    
+        if self.move == 'down':
+            openDirections = ['down', 'left', 'right']
+            checkDown = self.snake[0].moveDown()
+            checkLeft = self.snake[0].moveLeft()
+            checkRight = self.snake[0].moveRight()
+            for i in range(len(self.boarder)):
+                if pygame.sprite.collide_rect(checkDown, self.boarder[i]):
+                    index = openDirections.index("down")
+                    openDirections.pop(index)
+                if pygame.sprite.collide_rect(checkLeft, self.boarder[i]):
+                    index = openDirections.index("left")
+                    openDirections.pop(index)
+                if pygame.sprite.collide_rect(checkRight, self.boarder[i]):
+                    index = openDirections.index("right")
+                    openDirections.pop(index)
+        
+            for i in range(1, len(self.snake)):
+                if pygame.sprite.collide_rect(checkDown, self.snake[i]):
+                    index = openDirections.index("up")
+                    openDirections.pop(index)
+                if pygame.sprite.collide_rect(checkLeft, self.snake[i]):
+                    index = openDirections.index("left")
+                    openDirections.pop(index)
+                if pygame.sprite.collide_rect(checkRight, self.snake[i]):
+                    index = openDirections.index("right")
+                    openDirections.pop(index)
+    
+        return openDirections
+    
+    def on_evnet_AI(self):
 
 
     def on_loop(self):
