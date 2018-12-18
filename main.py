@@ -18,7 +18,7 @@ keys = {275: 'right', 274: 'down', 276: 'left', 273: 'up'}
 timeDelaySpeed = 0
 
 
-populationSize = 20
+populationSize = 5
 
 population = []
 
@@ -45,6 +45,10 @@ class App:
         self._running = True
         
         self.child = []
+        
+        self.population = {}
+        
+        self.fitness = 0
         
         self.stepsWithNoChange = 0
         
@@ -333,6 +337,8 @@ class App:
         
         self.child = []
         self.stepsWithNoChange = 0
+
+        self.fitness = 0
         
         # Recreate the Snake
         self.snake = [Snake(WHITE, 10, 10, 150, 260), Snake(WHITE, 10, 10, 140, 260), Snake(WHITE, 10, 10, 130, 260)]
@@ -651,38 +657,79 @@ class App:
     
         return openDirections
     
+    def locationOfFoodToHead(self):
+        foodCoordx = self.initFood.rect.x
+        foodCoordy = self.initFood.rect.y
+        headCoordx = self.snake[0].rect.x
+        headCoordy = self.snake[0].rect.y
+
+        if not pygame.sprite.collide_rect(self.snake[0], self.initFood):
+            if headCoordx == foodCoordx and headCoordy < foodCoordy:
+                goodDirection = ['down']
+            if headCoordx == foodCoordx and headCoordy > foodCoordy:
+                goodDirection = ['up']
+            if headCoordy == foodCoordy and headCoordx < foodCoordx:
+                goodDirection = ['right']
+            if headCoordy == foodCoordy and headCoordx > foodCoordx:
+                goodDirection = ['left']
+                
+            if headCoordx < foodCoordx and headCoordy > foodCoordy:
+                goodDirection = ['up', 'right']
+            if headCoordx > foodCoordx and headCoordy > foodCoordy:
+                goodDirection = ['up', 'left']
+            if headCoordx < foodCoordx and headCoordy < foodCoordy:
+                goodDirection = ['down', 'right']
+            if headCoordx > foodCoordx and headCoordy < foodCoordy:
+                goodDirection = ['down', 'left']
+        else:
+            goodDirection = []
+            
+        return goodDirection
     
-    def on_event_AI(self):
-        self.stepsWithNoChange += 1
+    def top2children(self, dic):
+        keys = list(dic)
+        keys.sort(reverse = True)
+        topFit = keys[0]
+        secondFit = keys[1]
+        topMoves = dic.get(topFit)
+        secondMoves = dic.get(secondFit)
+        print(topFit,secondFit)
+        return topMoves, secondMoves
+
         
-        for i in range(1, len(self.snake)):
-            if pygame.sprite.collide_rect(self.snake[0], self.snake[i]):
-                self.spaceToRestartText(20)
-                self.gameRestart()
-                break
+    def on_event_AI(self):
+        if len(self.population) > populationSize - 1:
+            population.append(self.population)
+            print(self.top2children(self.population))
+            self.population = {}
+            self.generationCount += 1
+            self.gameRestart()
+
+        self.stepsWithNoChange += 1
     
-        # Check if Snake hits the boarder - LOSE
-        for i in range(len(self.boarder)):
-            if pygame.sprite.collide_rect(self.snake[0], self.boarder[i]):
-                self.spaceToRestartText(20)
-                self.gameRestart()
+        if self.move in self.locationOfFoodToHead():
+            self.fitness += 1
+        else:
+            self.fitness -= 1.5
     
         # Checks if Snake eats Food
         if pygame.sprite.collide_rect(self.snake[0], self.initFood):
             self.eatFood()
             self.stepsWithNoChange = 0
+            self.fitness += 10
             
         possibleDirections = self.openDirections()
         
-        if self.stepsWithNoChange > 10:
+        if self.stepsWithNoChange > 40:
             possibleDirections = []
         
         if possibleDirections == []:
             print('lost')
             print('final score: ', self.score)
-            population.append(self.child)
-            print('pop: ', population)
-            print('pop len: ', len(population))
+            self.population[self.fitness] = self.child
+            print('pop: ', self.population)
+            print('pop len: ', len(self.population))
+            print('fit', self.population.keys())
             self.gameRestart()
         else:
             randomMoveIndex = random.randint(0, len(possibleDirections) - 1)
