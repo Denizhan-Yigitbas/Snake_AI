@@ -18,7 +18,7 @@ keys = {275: 'right', 274: 'down', 276: 'left', 273: 'up'}
 timeDelaySpeed = 0
 
 
-populationSize = 5
+populationSize = 2
 
 population = []
 
@@ -43,6 +43,8 @@ class App:
         self._display_surf = pygame.display.set_mode(self.size, pygame.HWSURFACE | pygame.DOUBLEBUF)
         self._display_surf.fill(BLACK)
         self._running = True
+        
+        self.i = 0
         
         self.child = []
         
@@ -334,6 +336,8 @@ class App:
         self._display_surf = pygame.display.set_mode(self.size, pygame.HWSURFACE | pygame.DOUBLEBUF)
         self._display_surf.fill(BLACK)
         self._running = True
+        
+        self.i = 0
         
         self.child = []
         self.stepsWithNoChange = 0
@@ -686,24 +690,48 @@ class App:
             
         return goodDirection
     
-    def top2children(self, dic):
+    def topNchildren(self, dic, n):
         keys = list(dic)
         keys.sort(reverse = True)
-        topFit = keys[0]
-        secondFit = keys[1]
-        topMoves = dic.get(topFit)
-        secondMoves = dic.get(secondFit)
-        print(topFit,secondFit)
-        return topMoves, secondMoves
+        top = []
+        for i in range(n):
+            nth = keys[i]
+            val = dic.get(nth)
+            top.append(val)
+        return top
 
+
+    def breed(self, child1, child2):
+        len1 = len(child1)
+        len2 = len(child2)
+        if len1 < len2:
+            randIdx = random.randint(0, len1-1)
+        else:
+            randIdx = random.randint(0, len2-1)
+        
+        for i in range(randIdx):
+            temp = child1[i]
+            child1[i] = child2[i]
+            child2[i] = temp
+        return child1, child2
+    
+    """
+    Given a list of move lists, this function will create a dictionary mapping each list
+    to a fitness score.
+    """
+    def createFitnessDictionary(self, lstOfMoveLsts):
+        pass
+
+        
+        
         
     def on_event_AI(self):
         if len(self.population) > populationSize - 1:
             population.append(self.population)
-            print(self.top2children(self.population))
+            fittest, secFittest = self.topNchildren(self.population, 2)[0], self.topNchildren(self.population, 2)[1]
+            breeded = self.breed(fittest, secFittest)
             self.population = {}
             self.generationCount += 1
-            self.gameRestart()
 
         self.stepsWithNoChange += 1
     
@@ -711,6 +739,8 @@ class App:
             self.fitness += 1
         else:
             self.fitness -= 1.5
+        
+        self.fitness = self.fitness()
     
         # Checks if Snake eats Food
         if pygame.sprite.collide_rect(self.snake[0], self.initFood):
@@ -720,10 +750,11 @@ class App:
             
         possibleDirections = self.openDirections()
         
-        if self.stepsWithNoChange > 40:
+        if self.stepsWithNoChange > 20:
             possibleDirections = []
         
         if possibleDirections == []:
+            print()
             print('lost')
             print('final score: ', self.score)
             self.population[self.fitness] = self.child
@@ -731,10 +762,14 @@ class App:
             print('pop len: ', len(self.population))
             print('fit', self.population.keys())
             self.gameRestart()
-        else:
+        elif self.generationCount == 0:
             randomMoveIndex = random.randint(0, len(possibleDirections) - 1)
             self.move = possibleDirections[randomMoveIndex]
-
+        else:
+            movesList = ['', 'up', 'left', 'down', 'left', 'left', 'up', 'left', 'down', 'right', 'right', 'down', 'left', 'up', 'left', 'down', 'down', 'right', 'down', 'down', 'right', 'down', 'right', 'right', 'right', 'right', 'down', 'right', 'up', 'left', 'down', 'right', 'down', 'down', 'down', 'right', 'down', 'right', 'right', 'up', 'right']
+            self.move = movesList[self.i]
+            self.i += 1
+            
         self.child.append(self.move)
         
         # if stored current direction is right
