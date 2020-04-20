@@ -661,6 +661,7 @@ class App:
     
         return openDirections
     
+    
     def locationOfFoodToHead(self):
         foodCoordx = self.initFood.rect.x
         foodCoordy = self.initFood.rect.y
@@ -690,6 +691,7 @@ class App:
             
         return goodDirection
     
+    
     def topNchildren(self, dic, n):
         keys = list(dic)
         keys.sort(reverse = True)
@@ -715,6 +717,7 @@ class App:
             child2[i] = temp
         return child1, child2
     
+    
     """
     Given a list of move lists, this function will create a dictionary mapping each list
     to a fitness score.
@@ -722,8 +725,6 @@ class App:
     def createFitnessDictionary(self, lstOfMoveLsts):
         pass
 
-        
-        
         
     def on_event_AI(self):
         if len(self.population) > populationSize - 1:
@@ -740,7 +741,7 @@ class App:
         else:
             self.fitness -= 1.5
         
-        self.fitness = self.fitness()
+        #self.fitness = self.fitness()
     
         # Checks if Snake eats Food
         if pygame.sprite.collide_rect(self.snake[0], self.initFood):
@@ -750,7 +751,7 @@ class App:
             
         possibleDirections = self.openDirections()
         
-        if self.stepsWithNoChange > 20:
+        if self.stepsWithNoChange > 300:
             possibleDirections = []
         
         if possibleDirections == []:
@@ -776,7 +777,7 @@ class App:
         if self.move == 'right':
             # Reset the Board
             self.boardReset()
-
+            
             # Store the current head of the snake
             snakeHead = self.snake[0]
 
@@ -900,3 +901,19 @@ class App:
 if __name__ == "__main__":
     theApp = App()
     theApp.on_execute()
+    
+
+
+""""
+
+Every time snake eats food, create a new graph where the snake could go.
+No edge between nodes from empty block to snake block. No edge between nodes from empty block to border.
+All edges must be between empty blocks.
+Get Node of Food.
+Get Node of Snake Head
+Find the shortest distance between Food and Snake Head.
+Take that route
+Eat Food and Repeat.
+
+
+"""
